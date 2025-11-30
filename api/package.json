@@ -1,0 +1,24 @@
+{
+  "name": "dumplin-api",
+  "version": "1.0.0",
+  "description": "Main API worker for Dumplin app",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "start": "wrangler dev"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241127.0",
+    "typescript": "^5.3.3",
+    "wrangler": "^3.80.0"
+  },
+  "dependencies": {
+    "hono": "^4.6.3",
+    "postgres": "^3.4.3"
+  }
+}
+
