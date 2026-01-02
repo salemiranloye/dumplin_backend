@@ -8,6 +8,10 @@ binding = "HYPERDRIVE"
 id = "0a88f51d028445308d64c950ca30079c"
 localConnectionString =
 
+[[kv_namespaces]]
+binding = "RATE_LIMIT"
+id = "1900ababe57f45c4979896fbac40e5ac"
+
 [observability]
 [observability.logs]
 enabled = true

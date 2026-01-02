@@ -27,7 +27,7 @@ export async function requireAuth(c: Context<{ Bindings: Env }>, next: Next) {
     try {
       // Validate session and get user
       const sessionResult = await sql`
-        SELECT s.*, u.phone_number, u.created_at as user_created_at, u.updated_at
+        SELECT s.*, u.phone_number, u.created_at as user_created_at
         FROM sessions s
         JOIN users u ON s.user_id = u.id
         WHERE s.token = ${token}

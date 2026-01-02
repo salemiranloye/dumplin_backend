@@ -7,6 +7,7 @@ export interface Env {
   TWILIO_AUTH_TOKEN?: string;
   TWILIO_PHONE_NUMBER?: string;
   SESSION_EXPIRY_DAYS?: string;
+  RATE_LIMIT?: KVNamespace;
 }
 
 // Create Postgres connection via Hyperdrive (production) or direct (local dev)
