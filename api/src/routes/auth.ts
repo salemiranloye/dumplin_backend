@@ -58,7 +58,8 @@ async function checkCooldown(
     }
   }
   
-  await kv.put(key, Math.floor(Date.now() / 1000).toString(), { expirationTtl: cooldownSeconds });
+  // KV requires minimum 60 second TTL, but cooldown logic still uses actual cooldownSeconds
+  await kv.put(key, Math.floor(Date.now() / 1000).toString(), { expirationTtl: Math.max(cooldownSeconds, 60) });
   return { allowed: true };
 }
 
@@ -98,8 +99,8 @@ auth.post('/send-code', async (c) => {
         }, 429);
       }
 
-      // Check phone number rate limit: 5 codes per hour
-      const phoneLimit = await checkRateLimit(c.env.RATE_LIMIT, `phone:${formattedPhone}`, 5, 3600);
+      // Check phone number rate limit: 10 codes per hour
+      const phoneLimit = await checkRateLimit(c.env.RATE_LIMIT, `phone:${formattedPhone}`, 10, 3600);
       if (!phoneLimit.allowed) {
         return c.json({
           success: false,
@@ -107,8 +108,8 @@ auth.post('/send-code', async (c) => {
         }, 429);
       }
 
-      // Check cooldown: 60 seconds between requests to same number
-      const cooldown = await checkCooldown(c.env.RATE_LIMIT, `cooldown:${formattedPhone}`, 60);
+      // Check cooldown: 30 seconds between requests to same number
+      const cooldown = await checkCooldown(c.env.RATE_LIMIT, `cooldown:${formattedPhone}`, 30);
       if (!cooldown.allowed) {
         return c.json({
           success: false,

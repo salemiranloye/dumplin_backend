@@ -1,8 +1,16 @@
 import { Hono } from 'hono';
-import { Env } from '../db';
+import { Env, getDb } from '../db';
 import { requireAuth } from '../middleware/auth';
 
-const api = new Hono<{ Bindings: Env }>();
+interface Variables {
+  user: {
+    id: string;
+    phone_number: string;
+    created_at: string;
+  };
+}
+
+const api = new Hono<{ Bindings: Env; Variables: Variables }>();
 
 // Example public API endpoint
 api.get('/items', async (c) => {
@@ -46,6 +54,44 @@ api.get('/user', requireAuth, async (c) => {
       created_at: user.created_at,
     },
   });
+});
+
+// Update user stats (dump count sync)
+api.patch('/user/stats', requireAuth, async (c) => {
+  try {
+    const user = c.get('user');
+    const body = await c.req.json();
+    const { dump_count } = body;
+
+    if (typeof dump_count !== 'number' || dump_count < 0) {
+      return c.json({
+        success: false,
+        error: 'Invalid dump_count value',
+      }, 400);
+    }
+
+    const sql = getDb(c.env);
+
+    try {
+      await sql`
+        UPDATE users
+        SET dump_count = ${dump_count}
+        WHERE id = ${user.id}
+      `;
+
+      return c.json({
+        success: true,
+      });
+    } finally {
+      await sql.end();
+    }
+  } catch (error: any) {
+    console.error('Update stats error:', error);
+    return c.json({
+      success: false,
+      error: 'Failed to update stats',
+    }, 500);
+  }
 });
 
 export default api;
